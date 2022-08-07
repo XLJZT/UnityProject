@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class TransitionManager : Singleton<TransitionManager>
+public class TransitionManager : Singleton<TransitionManager>,ISaveable
 {
     //初始加载的场景
     [SceneName] public string startScence;
@@ -35,11 +35,13 @@ public class TransitionManager : Singleton<TransitionManager>
         canTransition = gameState == GameState.Play;
     }
 
-    //private void Start()
-    //{
-    //    //加载初始场景startScence
-    //    StartCoroutine(TransitionToScene(string.Empty, startScence));
-    //}
+    private void Start()
+    {
+        ////加载初始场景startScence
+        //StartCoroutine(TransitionToScene(string.Empty, startScence));
+        ISaveable saveable = this;
+        saveable.SaveableRegister();
+    }
     public void Transition(string from,string to)
     {
         if(!isfade&&canTransition)
@@ -81,5 +83,17 @@ public class TransitionManager : Singleton<TransitionManager>
        
         fadeCanvasGroup.blocksRaycasts = false;
         isfade = false;
+    }
+
+    public GameSaveData GenerateSaveData()
+    {
+        GameSaveData saveData = new GameSaveData();
+        saveData.currentScence = SceneManager.GetActiveScene().name;
+        return saveData;
+    }
+
+    public void RestoreGameData(GameSaveData saveData)
+    {
+        Transition("Menu", saveData.currentScence);
     }
 }

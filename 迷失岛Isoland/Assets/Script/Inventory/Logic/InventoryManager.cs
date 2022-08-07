@@ -2,13 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InventoryManager : Singleton<InventoryManager>
+public class InventoryManager : Singleton<InventoryManager>,ISaveable
 {
     public ItemDataList_SO itemData;
 
     [SerializeField]
     private List<ItemName> itemList = new List<ItemName>();
 
+    private void Start()
+    {
+        ISaveable saveable = this;
+        saveable.SaveableRegister();
+    }
     private void OnEnable()
     {
         EventHandler.ItemUsedEvent += OnItemUsedEvent;
@@ -94,5 +99,17 @@ public class InventoryManager : Singleton<InventoryManager>
             }
         }
         return -1;
+    }
+
+    public GameSaveData GenerateSaveData()
+    {
+        GameSaveData saveData= new GameSaveData();
+        saveData.itemList = this.itemList;
+        return saveData;
+    }
+
+    public void RestoreGameData(GameSaveData saveData)
+    {
+        this.itemList = saveData.itemList;
     }
 }

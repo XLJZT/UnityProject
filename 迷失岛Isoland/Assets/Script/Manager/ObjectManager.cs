@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectManager : MonoBehaviour
+public class ObjectManager : MonoBehaviour,ISaveable
 {
     private Dictionary<ItemName, bool> itemAvailableDict = new Dictionary<ItemName, bool>();
     private Dictionary<string, bool> interactiveStateDict = new Dictionary<string, bool>();
@@ -15,7 +15,11 @@ public class ObjectManager : MonoBehaviour
 
     }
 
-
+    private void Start()
+    {
+        ISaveable saveable = this;
+        saveable.SaveableRegister();
+    }
 
     private void OnDisable()
     {
@@ -76,5 +80,19 @@ public class ObjectManager : MonoBehaviour
         //拾取加载Ui时，同时更新字典中的值
         if(itemDetails!=null)
             itemAvailableDict[itemDetails.itemName] = false;
+    }
+
+    public GameSaveData GenerateSaveData()
+    {
+        GameSaveData saveData = new GameSaveData();
+        saveData.itemAvailableDict = this.itemAvailableDict;
+        saveData.interactiveStateDict = this.interactiveStateDict;
+        return saveData;
+    }
+
+    public void RestoreGameData(GameSaveData saveData)
+    {
+        this.itemAvailableDict = saveData.itemAvailableDict;
+        this.interactiveStateDict = saveData.interactiveStateDict;
     }
 }
